@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { TopHeader } from './components/TopHeader';
 import { ContagionMap } from './components/ContagionMap';
 import { RiskDrawer } from './components/RiskDrawer';
@@ -14,7 +14,11 @@ import { AlertCircle, BrainCircuit, Activity } from 'lucide-react';
 function AppContent() {
   const [selectedNode, setSelectedNode] = useState<RiskNodeData | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { isLoading } = useRiskData();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState('2026 Q2');
+
+  const { isLoading, nodes } = useRiskData();
 
   const handleNodeClick = (node: RiskNodeData) => {
     setSelectedNode(node);
@@ -24,13 +28,58 @@ function AppContent() {
   };
 
   // Compute alert counts from actual node data
-  const { nodes } = useRiskData();
-  const alertCount = nodes.filter(n => n.status === RiskStatus.ALERT).length;
-  const warningCount = nodes.filter(n => n.status === RiskStatus.WARNING).length;
+  const alertCount = useMemo(() =>
+    nodes.filter(n => n.status === RiskStatus.ALERT).length, [nodes]);
+  const warningCount = useMemo(() =>
+    nodes.filter(n => n.status === RiskStatus.WARNING).length, [nodes]);
+
+  // Filter nodes based on search and company selection
+  const filteredNodeIds = useMemo(() => {
+    let filtered = nodes.map(n => n.id);
+
+    // Filter by company (L0 nodes)
+    if (selectedCompany) {
+      const companyNode = nodes.find(n => n.id === selectedCompany);
+      if (companyNode && companyNode.children) {
+        // Get all descendant IDs
+        const getDescendants = (nodeId: string): string[] => {
+          const node = nodes.find(n => n.id === nodeId);
+          if (!node) return [];
+          const descendants = [nodeId];
+          if (node.children) {
+            node.children.forEach(childId => {
+              descendants.push(...getDescendants(childId));
+            });
+          }
+          return descendants;
+        };
+        filtered = getDescendants(selectedCompany);
+      }
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(id => {
+        const node = nodes.find(n => n.id === id);
+        return node && node.label.toLowerCase().includes(query);
+      });
+    }
+
+    return new Set(filtered);
+  }, [nodes, selectedCompany, searchQuery]);
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-blue-100">
-      <TopHeader />
+      <TopHeader
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedCompany={selectedCompany}
+        onCompanyChange={setSelectedCompany}
+        selectedPeriod={selectedPeriod}
+        onPeriodChange={setSelectedPeriod}
+        companies={nodes.filter(n => n.level === 0)}
+      />
 
       <main className="flex-1 relative bg-slate-50/30 overflow-hidden">
         {/* Banner with stats summary */}
@@ -81,6 +130,7 @@ function AppContent() {
         <ContagionMap
           onNodeClick={handleNodeClick}
           selectedNodeId={selectedNode?.id}
+          filteredNodeIds={filteredNodeIds}
         />
       </main>
 

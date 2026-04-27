@@ -4,14 +4,15 @@ import { RiskNodeData, ContagionPath, RiskStatus } from '../types';
 import { useRiskData } from '../context/DataContext';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
-import { Info } from 'lucide-react';
+import { Info, Search } from 'lucide-react';
 
 interface ContagionMapProps {
   onNodeClick: (node: RiskNodeData) => void;
   selectedNodeId?: string;
+  filteredNodeIds: Set<string>;
 }
 
-export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selectedNodeId }) => {
+export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selectedNodeId, filteredNodeIds }) => {
   const { nodes, paths } = useRiskData();
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -30,8 +31,12 @@ export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selecte
     });
   };
 
-  // Helper to check if a node is visible based on ancestor expansion
+  // Helper to check if a node is visible based on ancestor expansion and filters
   const isNodeVisible = (node: RiskNodeData): boolean => {
+    // First check if node passes filter
+    if (!filteredNodeIds.has(node.id)) return false;
+
+    // Then check if ancestors are expanded (for non-L0 nodes)
     if (node.level === 0) return true;
     if (!node.parent) return false;
 
@@ -42,7 +47,7 @@ export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selecte
   };
 
   const visibleNodes = nodes.filter(isNodeVisible);
-  
+
   // Arrange nodes by level
   const levels = Array.from({ length: 5 }).map((_, i) =>
     visibleNodes.filter(node => node.level === i)
@@ -98,7 +103,7 @@ export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selecte
       observer.disconnect();
       cancelAnimationFrame(animationFrame);
     };
-  }, [expandedIds, visibleNodes.length]);
+  }, [expandedIds, visibleNodes.length, filteredNodeIds]);
 
   const renderPath = (path: ContagionPath, index: number) => {
     // Only render path if both source and target are currently visible
@@ -181,26 +186,36 @@ export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selecte
         </svg>
 
         <div className="flex gap-24 relative z-10">
-          {levels.map((levelNodes, levelIdx) => (
-            <div key={`level-${levelIdx}`} className="flex flex-col gap-8 pt-20">
-              {/* Level Label */}
-              <div className="absolute top-4 bento-header opacity-50">
-                Level {levelIdx} {levelIdx === 0 ? '成员公司' : levelIdx === 1 ? '一级流程框架' : levelIdx === 2 ? '二级流程框架' : levelIdx === 3 ? '主业务流程' : '子业务流程'}
+          {visibleNodes.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-500 font-bold">未找到匹配的流程</p>
+                <p className="text-slate-400 text-sm mt-1">尝试调整搜索条件或选择其他公司</p>
               </div>
-              
-              {levelNodes.map(node => (
-                <div id={`node-${node.id}`} key={node.id}>
-                  <RiskNode
-                    data={node}
-                    onClick={onNodeClick}
-                    isActive={selectedNodeId === node.id}
-                    isExpanded={expandedIds.has(node.id)}
-                    onToggle={handleToggle}
-                  />
-                </div>
-              ))}
             </div>
-          ))}
+          ) : (
+            levels.map((levelNodes, levelIdx) => (
+              <div key={`level-${levelIdx}`} className="flex flex-col gap-8 pt-20">
+                {/* Level Label */}
+                <div className="absolute top-4 bento-header opacity-50">
+                  Level {levelIdx} {levelIdx === 0 ? '成员公司' : levelIdx === 1 ? '一级流程框架' : levelIdx === 2 ? '二级流程框架' : levelIdx === 3 ? '主业务流程' : '子业务流程'}
+                </div>
+
+                {levelNodes.map(node => (
+                  <div id={`node-${node.id}`} key={node.id}>
+                    <RiskNode
+                      data={node}
+                      onClick={onNodeClick}
+                      isActive={selectedNodeId === node.id}
+                      isExpanded={expandedIds.has(node.id)}
+                      onToggle={handleToggle}
+                    />
+                  </div>
+                ))}
+              </div>
+            ))
+          )}
         </div>
       </div>
 
