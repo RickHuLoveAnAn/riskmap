@@ -1,27 +1,11 @@
 import { RiskStatus, NodeTier, type RiskNodeData, type ContagionPath } from './types';
 
 export const MOCK_NODES: RiskNodeData[] = [
-  // L0: Group
-  {
-    id: 'L0-001',
-    label: '平安集团',
-    level: 0,
-    status: RiskStatus.ALERT,
-    tier: NodeTier.TIER1,
-    children: ['L1-001', 'L1-002', 'L1-003'],
-    ldcAmount: 12000000,
-    rcsaDefects: 15,
-    auditIssues: 8,
-    penaltyCount: 2,
-    healthScore: 68,
-    duration: '3天',
-  },
-  // L1: Member Company
+  // L0: 成员公司
   {
     id: 'L1-001',
     label: '平安银行',
-    level: 1,
-    parent: 'L0-001',
+    level: 0,
     status: RiskStatus.ALERT,
     tier: NodeTier.TIER1,
     children: ['L2-001', 'L2-002'],
@@ -35,8 +19,7 @@ export const MOCK_NODES: RiskNodeData[] = [
   {
     id: 'L1-002',
     label: '平安产险',
-    level: 1,
-    parent: 'L0-001',
+    level: 0,
     status: RiskStatus.NORMAL,
     tier: NodeTier.TIER1,
     ldcAmount: 120000,
@@ -49,8 +32,7 @@ export const MOCK_NODES: RiskNodeData[] = [
   {
     id: 'L1-003',
     label: '平安人寿',
-    level: 1,
-    parent: 'L0-001',
+    level: 0,
     status: RiskStatus.WARNING,
     tier: NodeTier.TIER1,
     ldcAmount: 450000,
@@ -60,11 +42,11 @@ export const MOCK_NODES: RiskNodeData[] = [
     healthScore: 82,
     duration: '5天',
   },
-  // L2: Categories for Ping An Bank
+  // L1: 一级流程框架
   {
     id: 'L2-001',
-    label: '4 业务流程',
-    level: 2,
+    label: '运营管理框架',
+    level: 1,
     parent: 'L1-001',
     status: RiskStatus.ALERT,
     tier: NodeTier.TIER1,
@@ -78,8 +60,8 @@ export const MOCK_NODES: RiskNodeData[] = [
   },
   {
     id: 'L2-002',
-    label: '2 管理流程',
-    level: 2,
+    label: '财务管理框架',
+    level: 1,
     parent: 'L1-001',
     status: RiskStatus.WARNING,
     tier: NodeTier.TIER2,
@@ -91,15 +73,15 @@ export const MOCK_NODES: RiskNodeData[] = [
     healthScore: 78,
     duration: '4天',
   },
-  // L3: Processes
+  // L2: 二级流程框架
   {
     id: 'L3-001',
-    label: '4.3 客户服务与运营',
-    level: 3,
+    label: '客户服务与运营',
+    level: 2,
     parent: 'L2-001',
     status: RiskStatus.ALERT,
     tier: NodeTier.TIER1,
-    children: ['L4-001', 'L4-002', 'L4-004', 'L4-005'],
+    children: ['L4-001'],
     ldcAmount: 1200000,
     rcsaDefects: 3,
     auditIssues: 2,
@@ -109,12 +91,12 @@ export const MOCK_NODES: RiskNodeData[] = [
   },
   {
     id: 'L3-002',
-    label: '2.1 财务管理',
-    level: 3,
+    label: '财务管理',
+    level: 2,
     parent: 'L2-002',
     status: RiskStatus.WARNING,
     tier: NodeTier.TIER2,
-    children: ['L4-003', 'L4-006'],
+    children: ['L4-002'],
     ldcAmount: 0,
     rcsaDefects: 1,
     auditIssues: 1,
@@ -122,12 +104,43 @@ export const MOCK_NODES: RiskNodeData[] = [
     healthScore: 75,
     duration: '4天',
   },
-  // L4: Sub-processes
+  // L3: 主业务流程
   {
     id: 'L4-001',
-    label: '4.3.1.1 理赔资金结算',
-    level: 4,
+    label: '理赔运营管理',
+    level: 3,
     parent: 'L3-001',
+    status: RiskStatus.ALERT,
+    tier: NodeTier.TIER1,
+    children: ['L5-001', 'L5-002', 'L5-004', 'L5-005'],
+    ldcAmount: 1200000,
+    rcsaDefects: 3,
+    auditIssues: 2,
+    penaltyCount: 1,
+    healthScore: 55,
+    duration: '2天',
+  },
+  {
+    id: 'L4-002',
+    label: '财务核算管理',
+    level: 3,
+    parent: 'L3-002',
+    status: RiskStatus.WARNING,
+    tier: NodeTier.TIER2,
+    children: ['L5-003', 'L5-006'],
+    ldcAmount: 0,
+    rcsaDefects: 1,
+    auditIssues: 1,
+    penaltyCount: 0,
+    healthScore: 73,
+    duration: '4天',
+  },
+  // L4: 子业务流程
+  {
+    id: 'L5-001',
+    label: '理赔资金结算',
+    level: 4,
+    parent: 'L4-001',
     status: RiskStatus.ALERT,
     tier: NodeTier.TIER1,
     ldcAmount: 1200000,
@@ -140,10 +153,10 @@ export const MOCK_NODES: RiskNodeData[] = [
     aiExplanation: '该节点为本次风险爆发的核心源头。由于前端理赔系统校验逻辑失效，导致同一批次理赔指令触发了双次银行转账，目前已触发高额 LDC 熔断机制。',
   },
   {
-    id: 'L4-002',
-    label: '4.3.1.2 理赔档案管理',
+    id: 'L5-002',
+    label: '理赔档案管理',
     level: 4,
-    parent: 'L3-001',
+    parent: 'L4-001',
     status: RiskStatus.NORMAL,
     tier: NodeTier.TIER3,
     ldcAmount: 0,
@@ -154,10 +167,10 @@ export const MOCK_NODES: RiskNodeData[] = [
     duration: '60天+',
   },
   {
-    id: 'L4-003',
-    label: '2.1.2 财务对账流程',
+    id: 'L5-003',
+    label: '财务对账流程',
     level: 4,
-    parent: 'L3-002',
+    parent: 'L4-002',
     status: RiskStatus.WARNING,
     tier: NodeTier.TIER2,
     ldcAmount: 0,
@@ -170,10 +183,10 @@ export const MOCK_NODES: RiskNodeData[] = [
     aiExplanation: '根据 LLM 物理拓扑推演，下游财务对账系统直接依赖理赔结算结果。由于上游数据污染，预期对账流程将产生严重阻塞，建议立即启动人工核查。',
   },
   {
-    id: 'L4-004',
-    label: '4.3.4 客户反欺诈管理',
+    id: 'L5-004',
+    label: '客户反欺诈管理',
     level: 4,
-    parent: 'L3-001',
+    parent: 'L4-001',
     status: RiskStatus.NORMAL,
     tier: NodeTier.TIER2,
     ldcAmount: 0,
@@ -187,10 +200,10 @@ export const MOCK_NODES: RiskNodeData[] = [
     aiExplanation: 'LLM 预测受影响路径：由于重复支付事件中可能包含黑产恶意套现行为，反欺诈系统可能面临识别规则绕过的潜在威胁。概率约为 85%。',
   },
   {
-    id: 'L4-005',
-    label: '4.3.2.1 客户回访满意度',
+    id: 'L5-005',
+    label: '客户回访满意度',
     level: 4,
-    parent: 'L3-001',
+    parent: 'L4-001',
     status: RiskStatus.NORMAL,
     tier: NodeTier.TIER3,
     ldcAmount: 0,
@@ -201,10 +214,10 @@ export const MOCK_NODES: RiskNodeData[] = [
     duration: '100天+',
   },
   {
-    id: 'L4-006',
-    label: '2.1.1 预算执行监控',
+    id: 'L5-006',
+    label: '预算执行监控',
     level: 4,
-    parent: 'L3-002',
+    parent: 'L4-002',
     status: RiskStatus.NORMAL,
     tier: NodeTier.TIER2,
     ldcAmount: 0,
@@ -217,12 +230,12 @@ export const MOCK_NODES: RiskNodeData[] = [
 ];
 
 export const MOCK_PATHS: ContagionPath[] = [
-  { source: 'L4-001', target: 'L4-003', isAI: false, reason: '物理血缘：财务系统结算依赖' },
-  { source: 'L4-001', target: 'L4-004', isAI: true, probability: 85, reason: 'AI 预测：重复支付逻辑可能导致反欺诈规则库污染' },
+  { source: 'L5-001', target: 'L5-003', isAI: false, reason: '物理血缘：财务系统结算依赖' },
+  { source: 'L5-001', target: 'L5-004', isAI: true, probability: 85, reason: 'AI 预测：重复支付逻辑可能导致反欺诈规则库污染' },
 ];
 
 export const MOCK_TREND: Record<string, any[]> = {
-  'L4-001': [
+  'L5-001': [
     { date: '04-21', score: 95 },
     { date: '04-22', score: 92 },
     { date: '04-23', score: 90 },
@@ -230,7 +243,7 @@ export const MOCK_TREND: Record<string, any[]> = {
     { date: '04-25', score: 50 },
     { date: '04-26', score: 45 },
   ],
-  'L4-003': [
+  'L5-003': [
     { date: '04-21', score: 98 },
     { date: '04-22', score: 96 },
     { date: '04-23', score: 92 },

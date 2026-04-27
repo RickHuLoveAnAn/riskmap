@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { RiskNode } from './RiskNode';
 import { RiskNodeData, ContagionPath, RiskStatus } from '../types';
-import { MOCK_NODES, MOCK_PATHS } from '../mockData';
+import { useRiskData } from '../context/DataContext';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
 import { Info } from 'lucide-react';
@@ -12,10 +12,11 @@ interface ContagionMapProps {
 }
 
 export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selectedNodeId }) => {
+  const { nodes, paths } = useRiskData();
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [nodePositions, setNodePositions] = useState<Record<string, { x: number; y: number; leftX: number }>>({});
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(['L0-001', 'L1-001', 'L2-001', 'L3-001']));
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(['L1-001', 'L2-001', 'L3-001', 'L4-001']));
 
   const handleToggle = (id: string) => {
     setExpandedIds(prev => {
@@ -33,17 +34,17 @@ export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selecte
   const isNodeVisible = (node: RiskNodeData): boolean => {
     if (node.level === 0) return true;
     if (!node.parent) return false;
-    
-    const parent = MOCK_NODES.find(n => n.id === node.parent);
+
+    const parent = nodes.find(n => n.id === node.parent);
     if (!parent) return false;
-    
+
     return expandedIds.has(parent.id) && isNodeVisible(parent);
   };
 
-  const visibleNodes = MOCK_NODES.filter(isNodeVisible);
+  const visibleNodes = nodes.filter(isNodeVisible);
   
   // Arrange nodes by level
-  const levels = Array.from({ length: 6 }).map((_, i) => 
+  const levels = Array.from({ length: 5 }).map((_, i) =>
     visibleNodes.filter(node => node.level === i)
   );
 
@@ -101,8 +102,8 @@ export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selecte
 
   const renderPath = (path: ContagionPath, index: number) => {
     // Only render path if both source and target are currently visible
-    const sourceNode = MOCK_NODES.find(n => n.id === path.source);
-    const targetNode = MOCK_NODES.find(n => n.id === path.target);
+    const sourceNode = nodes.find(n => n.id === path.source);
+    const targetNode = nodes.find(n => n.id === path.target);
     if (!sourceNode || !targetNode || !isNodeVisible(sourceNode) || !isNodeVisible(targetNode)) return null;
 
     const start = nodePositions[path.source];
@@ -176,15 +177,15 @@ export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selecte
         {/* Background SVG for lines - placed as a background layer of the content */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" style={{ zIndex: 0 }}>
           {renderTreeLines()}
-          {MOCK_PATHS.map((path, idx) => renderPath(path, idx))}
+          {paths.map((path, idx) => renderPath(path, idx))}
         </svg>
 
-        <div className="flex gap-48 relative z-10">
+        <div className="flex gap-24 relative z-10">
           {levels.map((levelNodes, levelIdx) => (
             <div key={`level-${levelIdx}`} className="flex flex-col gap-8 pt-20">
               {/* Level Label */}
               <div className="absolute top-4 bento-header opacity-50">
-                Level {levelIdx} {levelIdx === 0 ? 'Group' : levelIdx === 1 ? 'Company' : `L${levelIdx-1} Logic`}
+                Level {levelIdx} {levelIdx === 0 ? '成员公司' : levelIdx === 1 ? '一级流程框架' : levelIdx === 2 ? '二级流程框架' : levelIdx === 3 ? '主业务流程' : '子业务流程'}
               </div>
               
               {levelNodes.map(node => (

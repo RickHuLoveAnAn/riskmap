@@ -33,6 +33,12 @@ export interface RiskNodeData {
   isAIPredicted?: boolean;
   contagionProbability?: number;
   aiExplanation?: string;
+
+  // Detail data for indicator tables
+  regulatoryPenalties?: RegulatoryPenalty[];
+  auditAccountabilities?: AuditAccountability[];
+  operationalRiskEvents?: OperationalRiskEvent[];
+  rcsaDefectsDetail?: RCSADefectDetail[];
 }
 
 export interface ContagionPath {
@@ -46,4 +52,48 @@ export interface ContagionPath {
 export interface HealthTrend {
   date: string;
   score: number;
+}
+
+// ==================== 风险指标明细数据模型 ====================
+
+export interface RegulatoryPenalty {
+  documentNo: string;
+  noticeDate: string;
+  issuer: string;
+  target: string;
+  reason: string;
+  amount: number;
+}
+
+export interface AuditAccountability {
+  eventCode: string;
+  eventName: string;
+  description: string;
+  eventDate: string;
+  lossAmount: number;
+  warningLevel: string;
+  accountablePerson: string;
+}
+
+export interface OperationalRiskEvent {
+  eventCode: string;
+  eventName: string;
+  description: string;
+  eventDate: string;
+  lossAmount: number;
+  recoveryAmount: number;
+  finalLossAmount: number;
+  eventLevel: string;
+  department: string;
+}
+
+export interface RCSADefectDetail {
+  defectCode: string;
+  defectName: string;
+  description: string;
+  defectLevel: string;
+  defectType: string;
+  isRectified: boolean;
+  rectificationPlan: string;
+  rectificationStatus: string;
 }

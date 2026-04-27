@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { TopHeader } from './components/TopHeader';
 import { ContagionMap } from './components/ContagionMap';
 import { RiskDrawer } from './components/RiskDrawer';
+import { DataProvider } from './context/DataContext';
 import { RiskNodeData } from './types';
 import { AlertCircle, BrainCircuit, Activity } from 'lucide-react';
 
@@ -22,6 +23,7 @@ export default function App() {
   };
 
   return (
+    <DataProvider>
     <div className="min-h-screen flex flex-col selection:bg-blue-100">
       <TopHeader />
       
@@ -87,5 +89,6 @@ export default function App() {
         }
       `}</style>
     </div>
+    </DataProvider>
   );
 }
