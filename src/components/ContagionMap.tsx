@@ -191,7 +191,7 @@ export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selecte
               <div className="text-center">
                 <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                 <p className="text-slate-500 font-bold">未找到匹配的流程</p>
-                <p className="text-slate-400 text-sm mt-1">尝试调整搜索条件或选择其他公司</p>
+                <p className="text-slate-400 text-sm mt-1">请尝试调整搜索条件或选择其他公司</p>
               </div>
             </div>
           ) : (
@@ -199,7 +199,7 @@ export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selecte
               <div key={`level-${levelIdx}`} className="flex flex-col gap-8 pt-20">
                 {/* Level Label */}
                 <div className="absolute top-4 bento-header opacity-50">
-                  Level {levelIdx} {levelIdx === 0 ? '成员公司' : levelIdx === 1 ? '一级流程框架' : levelIdx === 2 ? '二级流程框架' : levelIdx === 3 ? '主业务流程' : '子业务流程'}
+                  {levelIdx === 0 ? '成员公司' : levelIdx === 1 ? '一级流程框架' : levelIdx === 2 ? '二级流程框架' : levelIdx === 3 ? '主业务流程' : '子业务流程'}
                 </div>
 
                 {levelNodes.map(node => (
@@ -223,11 +223,11 @@ export const ContagionMap: React.FC<ContagionMapProps> = ({ onNodeClick, selecte
       <div className="fixed bottom-8 left-8 bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-xl flex gap-6 text-[11px] font-bold text-slate-500 z-30">
         <div className="flex items-center gap-2">
           <div className="w-3 h-0.5 bg-slate-300" />
-          <span>物理血缘 (确认)</span>
+          <span>物理血缘 (已确认)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-0.5 border-t-2 border-dashed border-indigo-500" />
-          <span>AI 传染推演 (虚线)</span>
+          <span>AI 传染推演 (预测)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-risk-red animate-pulse" />

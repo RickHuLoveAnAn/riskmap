@@ -88,9 +88,9 @@ function AppContent() {
             <div className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 rounded-full bg-risk-red animate-pulse shadow-sm shadow-risk-red/50" />
               <div className="flex flex-col">
-                <span className="text-[9px] bento-header opacity-60">High Risk Alerts</span>
+                <span className="text-[9px] bento-header opacity-60">高风险告警</span>
                 <span className="text-sm font-bold text-slate-900 tracking-tight" aria-live="polite">
-                  {String(alertCount).padStart(2, '0')} <span className="text-[10px] text-slate-400 font-medium">Nodes</span>
+                  {String(alertCount).padStart(2, '0')} <span className="text-[10px] text-slate-400 font-medium">个节点</span>
                 </span>
               </div>
             </div>
@@ -98,9 +98,9 @@ function AppContent() {
             <div className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 rounded-full bg-risk-orange shadow-sm shadow-risk-orange/50" />
               <div className="flex flex-col">
-                <span className="text-[9px] bento-header opacity-60">Active Warnings</span>
+                <span className="text-[9px] bento-header opacity-60">活跃预警</span>
                 <span className="text-sm font-bold text-slate-900 tracking-tight" aria-live="polite">
-                  {String(warningCount).padStart(2, '0')} <span className="text-[10px] text-slate-400 font-medium">Nodes</span>
+                  {String(warningCount).padStart(2, '0')} <span className="text-[10px] text-slate-400 font-medium">个节点</span>
                 </span>
               </div>
             </div>
@@ -110,8 +110,8 @@ function AppContent() {
             <div className="flex items-center gap-3 bg-indigo-50/50 px-4 py-2 rounded-xl border border-indigo-100 shadow-sm transition-all hover:bg-indigo-50">
               <BrainCircuit className="w-4 h-4 text-indigo-600" />
               <div className="flex flex-col">
-                <span className="text-[9px] bento-header text-indigo-600">AI Contagion Prob.</span>
-                <span className="text-xs font-black text-indigo-900 uppercase">12% Systemic Risk (Low)</span>
+                <span className="text-[9px] bento-header text-indigo-600">AI 传染概率</span>
+                <span className="text-xs font-black text-indigo-900 uppercase">12% 系统性风险 (低)</span>
               </div>
             </div>
           </div>

@@ -65,13 +65,13 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         <nav className="hidden lg:flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
           <button className="px-5 py-2 bg-white shadow-sm rounded-lg text-xs font-bold text-slate-800 flex items-center gap-2">
             <LayoutDashboard className="w-4 h-4 text-blue-500" />
-            DASHBOARD
+            仪表盘
           </button>
           <button className="px-5 py-2 text-slate-500 hover:text-slate-800 text-xs font-bold tracking-wider">
-            REPORTS
+            报告
           </button>
           <button className="px-5 py-2 text-slate-500 hover:text-slate-800 text-xs font-bold tracking-wider">
-            AI RULES
+            AI 规则
           </button>
         </nav>
       </div>

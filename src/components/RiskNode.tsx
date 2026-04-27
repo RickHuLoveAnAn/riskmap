@@ -65,7 +65,7 @@ export const RiskNode: React.FC<RiskNodeProps> = ({ data, onClick, isActive, isE
       >
         <div className={cn("w-3 h-3 rounded-full shrink-0", config.color, isAlert && "animate-pulse")} />
         <div className="flex-1 min-w-0">
-          <div className="text-[9px] font-black text-slate-300 uppercase tracking-tighter mb-0.5">Level {data.level}</div>
+          <div className="text-[9px] font-black text-slate-300 uppercase tracking-tighter mb-0.5">L{data.level}</div>
           <h3 className="font-bold text-slate-700 text-[13px] truncate" title={data.label}>
             {data.label}
           </h3>
@@ -107,7 +107,7 @@ export const RiskNode: React.FC<RiskNodeProps> = ({ data, onClick, isActive, isE
           </span>
           {data.isAIPredicted && (
             <span className="px-2 py-0.5 text-[9px] bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full font-black uppercase">
-              AI PREDICTED {data.contagionProbability}%
+              AI 预测 {data.contagionProbability}%
             </span>
           )}
         </div>

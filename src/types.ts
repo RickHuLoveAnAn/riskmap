@@ -5,9 +5,9 @@ export enum RiskStatus {
 }
 
 export enum NodeTier {
-  TIER1 = 'Tier 1',
-  TIER2 = 'Tier 2',
-  TIER3 = 'Tier 3',
+  TIER1 = '一类',
+  TIER2 = '二类',
+  TIER3 = '三类',
 }
 
 export interface RiskNodeData {
