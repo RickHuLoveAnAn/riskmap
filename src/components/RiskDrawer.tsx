@@ -26,6 +26,17 @@ interface IndicatorConfig {
 export const RiskDrawer: React.FC<RiskDrawerProps> = ({ node, isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<IndicatorTab>('penalty');
 
+  // Escape key to close drawer
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   // Reset active tab when node changes
   React.useEffect(() => {
     if (node) {
@@ -58,7 +69,7 @@ export const RiskDrawer: React.FC<RiskDrawerProps> = ({ node, isOpen, onClose })
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-[900px] bg-white shadow-2xl z-50 flex flex-col"
+            className="fixed top-0 right-0 h-full w-full md:w-[700px] lg:w-[900px] bg-white shadow-2xl z-50 flex flex-col"
           >
             {/* Header */}
             <div className="p-6 border-b flex items-center justify-between shrink-0 bg-white z-10">
@@ -76,7 +87,12 @@ export const RiskDrawer: React.FC<RiskDrawerProps> = ({ node, isOpen, onClose })
                   <span className="text-xs text-slate-400 uppercase tracking-widest">{node.tier} | {node.id}</span>
                 </div>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                aria-label="关闭抽屉"
+                role="button"
+              >
                 <X className="w-6 h-6 text-slate-400" />
               </button>
             </div>

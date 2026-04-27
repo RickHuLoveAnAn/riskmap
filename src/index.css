@@ -16,6 +16,17 @@
   animation: breathe 2s infinite;
 }
 
+/* Focus visible styles for keyboard navigation */
+:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* Remove default focus outline and use custom */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 body {
   background-color: #F8FAFC;
   @apply text-slate-900 font-sans antialiased;
@@ -47,4 +58,15 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #CBD5E1;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
