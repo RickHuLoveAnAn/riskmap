@@ -111,25 +111,34 @@ export function toRCSADefects(rows: Record<string, string>[]): RCSADefectDetail[
 }
 
 export function toNodes(rows: Record<string, string>[]): RiskNodeData[] {
-  return rows.map(r => ({
-    id: r.id,
-    label: r.label,
-    level: Number(r.level) || 0,
-    parent: r.parent || undefined,
-    status: r.status as RiskStatus,
-    tier: r.tier as NodeTier,
-    children: r.children ? r.children.split(',') : undefined,
-    ldcAmount: Number(r.ldcAmount) || 0,
-    rcsaDefects: Number(r.rcsaDefects) || 0,
-    auditIssues: Number(r.auditIssues) || 0,
-    penaltyCount: Number(r.penaltyCount) || 0,
-    healthScore: Number(r.healthScore) || 0,
-    duration: r.duration || '',
-    description: r.description || undefined,
-    isAIPredicted: r.isAIPredicted === 'true' ? true : undefined,
-    contagionProbability: r.contagionProbability ? Number(r.contagionProbability) : undefined,
-    aiExplanation: r.aiExplanation || undefined,
-  }));
+  return rows.map(r => {
+    // Parse children: split by comma and filter out empty strings
+    let children: string[] | undefined = undefined;
+    if (r.children && r.children.trim()) {
+      children = r.children.split(',').map(c => c.trim()).filter(c => c.length > 0);
+      if (children.length === 0) children = undefined;
+    }
+
+    return {
+      id: r.id,
+      label: r.label,
+      level: Number(r.level) || 0,
+      parent: r.parent || undefined,
+      status: r.status as RiskStatus,
+      tier: r.tier as NodeTier,
+      children,
+      ldcAmount: Number(r.ldcAmount) || 0,
+      rcsaDefects: Number(r.rcsaDefects) || 0,
+      auditIssues: Number(r.auditIssues) || 0,
+      penaltyCount: Number(r.penaltyCount) || 0,
+      healthScore: Number(r.healthScore) || 0,
+      duration: r.duration || '',
+      description: r.description || undefined,
+      isAIPredicted: r.isAIPredicted === 'true' ? true : undefined,
+      contagionProbability: r.contagionProbability ? Number(r.contagionProbability) : undefined,
+      aiExplanation: r.aiExplanation || undefined,
+    };
+  });
 }
 
 export function toPaths(rows: Record<string, string>[]): ContagionPath[] {
