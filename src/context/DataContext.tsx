@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { RiskNodeData, ContagionPath } from '../types';
-import { MOCK_NODES, MOCK_PATHS, MOCK_TREND } from '../mockData';
+import { MOCK_TREND } from '../mockData';
 import {
   loadCSV,
   toRegulatoryPenalties,
   toAuditAccountabilities,
   toOperationalRiskEvents,
   toRCSADefects,
+  toNodes,
+  toPaths,
 } from '../lib/csvLoader';
 
 interface DataContextValue {
@@ -19,8 +21,8 @@ interface DataContextValue {
 }
 
 const DataContext = createContext<DataContextValue>({
-  nodes: MOCK_NODES,
-  paths: MOCK_PATHS,
+  nodes: [],
+  paths: [],
   trends: MOCK_TREND,
   isLoading: false,
   error: null,
@@ -30,7 +32,8 @@ const DataContext = createContext<DataContextValue>({
 export const useRiskData = () => useContext(DataContext);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [nodes, setNodes] = useState<RiskNodeData[]>(MOCK_NODES);
+  const [nodes, setNodes] = useState<RiskNodeData[]>([]);
+  const [paths, setPaths] = useState<ContagionPath[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,12 +42,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
 
     try {
-      const [penaltyRows, auditRows, riskRows, rcsaRows] = await Promise.all([
+      const [nodeRows, pathRows, penaltyRows, auditRows, riskRows, rcsaRows] = await Promise.all([
+        loadCSV('/data/nodes.csv'),
+        loadCSV('/data/paths.csv'),
         loadCSV('/data/regulatory-penalties.csv'),
         loadCSV('/data/audit-accountabilities.csv'),
         loadCSV('/data/operational-risk-events.csv'),
         loadCSV('/data/rcsa-defects.csv'),
       ]);
+
+      // Parse nodes and paths from CSV
+      const parsedNodes = toNodes(nodeRows);
+      const parsedPaths = toPaths(pathRows);
 
       // Group raw CSV rows by nodeId before type conversion
       const penaltyMap = groupByRows(penaltyRows, 'nodeId');
@@ -52,7 +61,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const riskMap = groupByRows(riskRows, 'nodeId');
       const rcsaMap = groupByRows(rcsaRows, 'nodeId');
 
-      const enrichedNodes = MOCK_NODES.map(node => ({
+      // Enrich nodes with detail data
+      const enrichedNodes = parsedNodes.map(node => ({
         ...node,
         regulatoryPenalties: toRegulatoryPenalties(penaltyMap[node.id] || []),
         auditAccountabilities: toAuditAccountabilities(auditMap[node.id] || []),
@@ -61,9 +71,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }));
 
       setNodes(enrichedNodes);
+      setPaths(parsedPaths);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data');
-      // Fallback to base mock data (already in state)
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +87,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <DataContext.Provider
       value={{
         nodes,
-        paths: MOCK_PATHS,
+        paths,
         trends: MOCK_TREND,
         isLoading,
         error,

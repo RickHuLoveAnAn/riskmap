@@ -1,0 +1,3 @@
+source,target,isAI,probability,reason
+L5-001,L5-003,false,,物理血缘：财务系统结算依赖
+L5-001,L5-004,true,85,AI 预测：重复支付逻辑可能导致反欺诈规则库污染

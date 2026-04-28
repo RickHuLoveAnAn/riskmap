@@ -3,6 +3,10 @@ import type {
   AuditAccountability,
   OperationalRiskEvent,
   RCSADefectDetail,
+  RiskNodeData,
+  ContagionPath,
+  RiskStatus,
+  NodeTier,
 } from '../types';
 
 function parseCSVLine(line: string): string[] {
@@ -103,5 +107,37 @@ export function toRCSADefects(rows: Record<string, string>[]): RCSADefectDetail[
     isRectified: r.isRectified === 'true',
     rectificationPlan: r.rectificationPlan,
     rectificationStatus: r.rectificationStatus,
+  }));
+}
+
+export function toNodes(rows: Record<string, string>[]): RiskNodeData[] {
+  return rows.map(r => ({
+    id: r.id,
+    label: r.label,
+    level: Number(r.level) || 0,
+    parent: r.parent || undefined,
+    status: r.status as RiskStatus,
+    tier: r.tier as NodeTier,
+    children: r.children ? r.children.split(',') : undefined,
+    ldcAmount: Number(r.ldcAmount) || 0,
+    rcsaDefects: Number(r.rcsaDefects) || 0,
+    auditIssues: Number(r.auditIssues) || 0,
+    penaltyCount: Number(r.penaltyCount) || 0,
+    healthScore: Number(r.healthScore) || 0,
+    duration: r.duration || '',
+    description: r.description || undefined,
+    isAIPredicted: r.isAIPredicted === 'true' ? true : undefined,
+    contagionProbability: r.contagionProbability ? Number(r.contagionProbability) : undefined,
+    aiExplanation: r.aiExplanation || undefined,
+  }));
+}
+
+export function toPaths(rows: Record<string, string>[]): ContagionPath[] {
+  return rows.map(r => ({
+    source: r.source,
+    target: r.target,
+    isAI: r.isAI === 'true',
+    probability: r.probability ? Number(r.probability) : undefined,
+    reason: r.reason || undefined,
   }));
 }
