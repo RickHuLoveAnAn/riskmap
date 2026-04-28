@@ -112,10 +112,10 @@ export function toRCSADefects(rows: Record<string, string>[]): RCSADefectDetail[
 
 export function toNodes(rows: Record<string, string>[]): RiskNodeData[] {
   return rows.map(r => {
-    // Parse children: split by comma and filter out empty strings
+    // Parse children: split by semicolon and filter out empty strings
     let children: string[] | undefined = undefined;
     if (r.children && r.children.trim()) {
-      children = r.children.split(',').map(c => c.trim()).filter(c => c.length > 0);
+      children = r.children.split(';').map(c => c.trim()).filter(c => c.length > 0);
       if (children.length === 0) children = undefined;
     }
 
